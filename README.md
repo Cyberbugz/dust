@@ -1,30 +1,6 @@
 
 # Dust: Laravel Framework Base Package
 
-A modular base package for Laravel projects, designed to enhance functionality and streamline development.
-
-[GitHub Repository](https://github.com/Cyberbugz/dust)
-
-## Table of Contents
-1. [Introduction](#introduction)
-2. [Installation](#installation)
-3. [Usage](#usage)
-4. [File Structure](#file-structure)
-5. [Key Features](#key-features)
-6. [Detailed Description of Components](#detailed-description-of-components)
-    - [Config](#config)
-    - [Base](#base)
-    - [Console](#console)
-    - [Http](#http)
-    - [Providers](#providers)
-    - [Support](#support)
-7. [Command Cheat Sheet](#Command-Cheat-Sheet)
-8. [Overview](#Overview)
-
----
-
-# Dust: Laravel Framework Base Package
-
 Welcome to **Dust**, a **modular framework base package** for Laravel. Designed with developers in mind, Dust accelerates your Laravel project development by providing **pre-configured tools**, **enhanced CLI commands**, and a robust structure for **modular architecture**.
 
 [![GitHub stars](https://img.shields.io/github/stars/Cyberbugz/dust.svg?style=for-the-badge&color=blue)](https://github.com/Cyberbugz/dust/stargazers)
@@ -32,6 +8,27 @@ Welcome to **Dust**, a **modular framework base package** for Laravel. Designed 
 [![GitHub license](https://img.shields.io/github/license/Cyberbugz/dust.svg?style=for-the-badge&color=green)](https://github.com/Cyberbugz/dust/blob/main/LICENSE)
 
 ---
+
+## Table of Contents
+1. [What Is Dust](#-what-is-dust)
+2. [Why Use Dust](#-why-use-dust)
+3. [Installation](#installation)
+4. [Usage](#usage)
+5. [File Structure](#file-structure)
+6. [Key Features](#key-features)
+7. [Detailed Description of Components](#detailed-description-of-components)
+    - [Config](#config)
+    - [Base](#base)
+    - [Console](#console)
+    - [Http](#http)
+    - [Providers](#providers)
+    - [Support](#support)
+8. [Command Cheat Sheet](#Command-Cheat-Sheet)
+9. [Overview](#Overview)
+
+---
+
+
 
 ## 🚀 What is Dust?
 
@@ -54,13 +51,6 @@ Dust empowers Laravel developers to focus on building features rather than boile
 - **Flexibility**: Supports both traditional and modern Laravel practices.
 - **Scalability**: Designed to grow with your project, enabling large-scale applications.
 - **Community Standards**: Fully adheres to Laravel's and PSR-4 standards.
-
----
-
-## 🌐 Links
-- [GitHub Repository](https://github.com/Cyberbugz/dust)
-- [Issues & Feature Requests](https://github.com/Cyberbugz/dust/issues)
-- [License](https://github.com/Cyberbugz/dust/blob/main/LICENSE)
 
 ---
 
