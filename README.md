@@ -5,7 +5,7 @@ Welcome to **Dust**, a **modular framework base package** for Laravel. Designed 
 
 [![GitHub stars](https://img.shields.io/github/stars/Cyberbugz/dust.svg?style=for-the-badge&color=blue)](https://github.com/Cyberbugz/dust/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/Cyberbugz/dust.svg?style=for-the-badge&color=yellow)](https://github.com/Cyberbugz/dust/issues)
-[![GitHub license](https://img.shields.io/github/license/Cyberbugz/dust.svg?style=for-the-badge&color=green)](https://github.com/Cyberbugz/dust/blob/main/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/Cyberbugz/dust.svg?style=for-the-badge&color=green)](https://github.com/Cyberbugz/dust/blob/master/LICENSE)
 
 ---
 
