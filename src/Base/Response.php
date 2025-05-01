@@ -15,10 +15,13 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Validation\ValidationException;
 use Dust\Base\Contracts\RequestHandlerInterface;
+use Dust\Http\Responses\Support\ErrorLogHandler;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Auth\Access\AuthorizationException;
+use Dust\Http\Responses\Contracts\ErrorLogHandler as ErrorLogHandlerInterface;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Database\MultipleRecordsFoundException;
+use Dust\Http\Responses\Contracts\ErrorResponseHandler;
 use Dust\Base\Contracts\RestrictEventInjectionInterface;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -42,7 +45,13 @@ abstract class Response implements ResponseInterface
         ValidationException::class,
     ];
 
-    private ?Closure $onLogObserver = null;
+    private static ?ErrorResponseHandler $errorResponseHandler = null;
+    private static ?ErrorLogHandlerInterface $errorLogHandler = null;
+
+    /**
+     * @var callable[]
+     */
+    private array $logObservers = [];
 
     /**
      * @var callable[]
@@ -56,6 +65,10 @@ abstract class Response implements ResponseInterface
 
     private bool $silence = false;
 
+    private ?Request $request = null;
+
+    private static bool $enableLogging = true;
+
     public function __construct(protected Application $app)
     {
     }
@@ -65,6 +78,7 @@ abstract class Response implements ResponseInterface
      */
     public function send(RequestHandlerInterface $handler, Request $request): mixed
     {
+        $this->request = $request;
         try {
             $data = call_user_func([$handler, 'handle'], $this, $request);
             $this->fireSuccessChain($data);
@@ -82,6 +96,31 @@ abstract class Response implements ResponseInterface
         }
     }
 
+    protected function getRequest(): ?Request
+    {
+        return $this->request;
+    }
+
+    public static function setErrorResponseHandler(ErrorResponseHandler $handler): void
+    {
+        self::$errorResponseHandler = $handler;
+    }
+
+    public static function enableLogging(): void
+    {
+        self::$enableLogging = true;
+    }
+
+    public static function disableLogging(): void
+    {
+        self::$enableLogging = false;
+    }
+
+    public static function setErrorLogHandler(ErrorLogHandlerInterface $handler): void
+    {
+        self::$errorLogHandler = $handler;
+    }
+
     final public function silent(): static
     {
         $this->silence = true;
@@ -90,7 +129,7 @@ abstract class Response implements ResponseInterface
     }
 
     /**
-     * @throws \Dust\Exceptions\Response\EventInjectionRestrictedException
+     * @throws EventInjectionRestrictedException
      */
     final public function onSuccess(callable $handler): static
     {
@@ -103,7 +142,7 @@ abstract class Response implements ResponseInterface
     }
 
     /**
-     * @throws \Dust\Exceptions\Response\EventInjectionRestrictedException
+     * @throws EventInjectionRestrictedException
      */
     final public function onFailure(callable $handler): static
     {
@@ -118,40 +157,35 @@ abstract class Response implements ResponseInterface
 
     final public function onLog(Closure $handler): static
     {
-        $this->onLogObserver = $handler;
+        $this->logObservers[] = $handler;
 
         return $this;
     }
 
     final protected function logError(RequestHandlerInterface $handler, Request $request, Throwable $e): void
     {
-        Logger::error(
-            sprintf('%s_ERROR',
-                $this->getSnakedName(
-                    $this->getClassName($handler),
-                ),
-            ),
+        if (! self::$enableLogging) {
+            return;
+        }
+
+        $logHandler = self::$errorLogHandler ?: $this->defaultLogHandler();
+
+        if (!empty($this->logObservers)) {
+            foreach ($this->logObservers as $observer) {
+                $logHandler->addLogObserver($observer);
+            }
+        }
+
+        $logHandler->handle(
+            $handler,
             $e,
-            $this->buildLogBody($request, $e),
+            $request,
         );
     }
 
-    final protected function getSnakedName(string $name): string
+    final protected function defaultLogHandler(): ErrorLogHandlerInterface
     {
-        return strtoupper(
-            implode('_',
-                array_filter(
-                    preg_split('/(?=[A-Z])/', $name),
-                ),
-            ),
-        );
-    }
-
-    final protected function getClassName(RequestHandlerInterface $handler): string
-    {
-        $namespace = explode('\\', get_class($handler));
-
-        return array_pop($namespace);
+        return new ErrorLogHandler();
     }
 
     final protected function fireSuccessChain(mixed $resource): void
@@ -178,14 +212,6 @@ abstract class Response implements ResponseInterface
         }
 
         $this->failure($request, $e);
-    }
-
-    final protected function buildLogBody(Request $request, Throwable $e): array
-    {
-        return array_merge(
-            ($onLog = $this->onLogObserver) ? $onLog($request, $e) : $this->errorMeta($e, self::isDebug()),
-            ['user' => $request->user()->id ?? null],
-        );
     }
 
     /**
@@ -219,10 +245,7 @@ abstract class Response implements ResponseInterface
             }
         }
 
-        $debugMode = self::isDebug();
-
-        return new ErrorResponse($debugMode ? $e->getMessage() : 'Error!! try again later.',
-            $this->errorMeta($e, $debugMode), status: 500);
+        return new ErrorResponse($e, $this->getEnvironment(), self::$errorResponseHandler);
     }
 
     final protected function isLaravelHandledException(Throwable $e): bool
@@ -236,26 +259,9 @@ abstract class Response implements ResponseInterface
         return false;
     }
 
-    final protected function isDebug(): bool
+    final protected function getEnvironment(): string
     {
-        return (bool) $this->app->config['app']['debug'];
-    }
-
-    protected function errorMeta(Throwable $e, bool $debugMode): array
-    {
-        if (!$debugMode) {
-            return [];
-        }
-
-        return [
-            'exception' => [
-                'class' => get_class($e),
-                'code' => $e->getCode(),
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-            ],
-        ];
+        return $this->app->config['app']['env'];
     }
 
     protected function success(mixed $resource): void

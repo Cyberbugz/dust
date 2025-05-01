@@ -33,6 +33,16 @@ class Logger
             array_merge($context, static::buildExceptionContext($e)), $channel);
     }
 
+    public static function traceableError(
+        string $message,
+        Throwable $e,
+        array $context = [],
+        ?string $channel = null,
+    ): void {
+        static::log('error', $message,
+            array_merge($context, static::buildFullExceptionContext($e)), $channel);
+    }
+
     public static function emergency(string $message, Throwable $e, array $context = [], ?string $channel = null): void
     {
         static::log('emergency', $message,
@@ -48,8 +58,20 @@ class Logger
     {
         return [
             'message' => $e->getMessage(),
+            'code'    => $e->getCode(),
+            'file'    => $e->getFile(),
+            'line'    => $e->getLine(),
+        ];
+    }
+
+    protected static function buildFullExceptionContext(Throwable $e): array
+    {
+        return [
+            'message' => $e->getMessage(),
+            'code' => $e->getCode(),
             'file' => $e->getFile(),
             'line' => $e->getLine(),
+            'previous' => $e->getPrevious(),
             'trace' => $e->getTraceAsString(),
         ];
     }
