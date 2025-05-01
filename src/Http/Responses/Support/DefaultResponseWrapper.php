@@ -29,11 +29,21 @@ class DefaultResponseWrapper implements ResponseWrapper
 
     public function body(): array
     {
-        return [
+        $body = [
             'message' => !$this->isProduction() ? $this->e->getMessage() : self::DEFAULT_MESSAGE,
             'data'    => null,
             'errors'  => $this->getErrorList(),
         ];
+
+        if (!$this->isProduction()) {
+            $body['trace'] = [
+                'exception' => get_class($this->e),
+                'file'      => $this->e->getFile(),
+                'line'      => $this->e->getLine(),
+            ];
+        }
+
+        return $body;
     }
 
     public function headers(): array

@@ -56,20 +56,13 @@ class ErrorLogHandler implements \Dust\Http\Responses\Contracts\ErrorLogHandler
             $body = array_merge($body, $observer($request, $e));
         }
 
-        return array_merge($body, $this->errorMeta($request->user(), $e));
+        return array_merge($body, $this->errorMeta($request->user()));
     }
 
-    protected function errorMeta(?Authenticatable $user, Throwable $e): array
+    protected function errorMeta(?Authenticatable $user): array
     {
         return [
             'user' => $user?->getAuthIdentifier(),
-            'exception' => [
-                'class' => get_class($e),
-                'code' => $e->getCode(),
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-            ],
         ];
     }
 }
