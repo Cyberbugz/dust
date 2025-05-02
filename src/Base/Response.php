@@ -69,6 +69,10 @@ abstract class Response implements ResponseInterface
 
     private static bool $enableLogging = true;
 
+    private static bool $laravelCanHandleItsExceptions = true;
+
+    private static array $mandatoryLaravelHandledExceptions = [];
+
     public function __construct(protected Application $app)
     {
     }
@@ -86,6 +90,7 @@ abstract class Response implements ResponseInterface
             return $this->createResource($data);
         } catch (Throwable $e) {
             $handled = $this->isLaravelHandledException($e);
+
             if (!$handled) {
                 $this->logError($handler, $request, $e);
             }
@@ -119,6 +124,26 @@ abstract class Response implements ResponseInterface
     public static function setErrorLogHandler(ErrorLogHandlerInterface $handler): void
     {
         self::$errorLogHandler = $handler;
+    }
+
+    public static function enableLaravelCanHandleItsExceptions(): void
+    {
+        self::$laravelCanHandleItsExceptions = true;
+    }
+
+    public static function disableLaravelCanHandleItsExceptions(): void
+    {
+        self::$laravelCanHandleItsExceptions = false;
+    }
+
+    public static function addMandatoryLaravelHandledException(string $exception): void
+    {
+        self::$mandatoryLaravelHandledExceptions[] = $exception;
+    }
+
+    protected function canLaravelHandleItsExceptions(): bool
+    {
+        return self::$laravelCanHandleItsExceptions;
     }
 
     final public function silent(): static
@@ -248,7 +273,27 @@ abstract class Response implements ResponseInterface
         return new ErrorResponse($e, $this->getEnvironment(), self::$errorResponseHandler);
     }
 
-    final protected function isLaravelHandledException(Throwable $e): bool
+    final protected function isMandatoryLaravelHandledException(Throwable $e): bool
+    {
+        foreach (self::$mandatoryLaravelHandledExceptions as $ex) {
+            if ($e instanceof $ex) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected function isLaravelHandledException(Throwable $e): bool
+    {
+        if ($this->isMandatoryLaravelHandledException($e)) {
+            return true;
+        }
+
+        return $this->canLaravelHandleItsExceptions() && $this->isStandardLaravelException($e);
+    }
+
+    private function isStandardLaravelException(Throwable $e): bool
     {
         foreach (self::LARAVEL_HANDLED_EXCEPTIONS as $ex) {
             if ($e instanceof $ex) {
