@@ -168,6 +168,13 @@ README.md
   - **Key Options:**
     - --module: Specify the target module.
     - --guard: Set the guard for this story.
+- `make:crud`
+    - **Description:** Generates a full set of CRUD “stories” by calling `story:make` once for each operation in: **Index**, **Store**, **Show**, **Update**, **Destroy**.
+    - **Key Options:**
+        - `--module` (required): Specify the target module.
+        - `--guard` (optional): Set the guard/environment (e.g., `api`, `web`).
+        - `--absolute` (optional): Provide the absolute path to the modules directory.
+
 - `make:migration`
     - **Description:** Extends the migration creation command to support module-specific paths.
     - **Key Options:**
@@ -631,36 +638,38 @@ Provides a centralized logging mechanism with support for dynamic channels.
 
 Below is a comprehensive cheat sheet for all the Artisan commands available in the Dust package. Each command supports modular scaffolding using the `--module` flag.
 
-| **Command**                  | **Description**                                                                                  | **Example**                                                                                      |
-|------------------------------|--------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|
-| `make:story`                 | Creates a "story" structure, including controller, routes, and tests.                           | `php artisan make:story UserStory --module User --guard api`                                    |
-| `make:migration`             | Generates a migration file in a specific module.                                                | `php artisan make:migration create_users_table --module User`                                   |
-| `db:seed`                    | Runs a module-specific database seeder.                                                        | `php artisan db:seed --module User`                                                             |
-| `make:cast`                  | Creates a custom cast class for a module.                                                      | `php artisan make:cast CustomCast --module User`                                                |
-| `make:command`               | Generates a custom Artisan command for a module.                                               | `php artisan make:command CustomCommand --module User`                                          |
-| `make:controller`            | Scaffolds a controller with associated requests, responses, and services.                      | `php artisan make:controller UserController --module User --guard api`                          |
-| `make:event`                 | Generates an event class within a module.                                                      | `php artisan make:event UserRegistered --module User`                                           |
-| `make:exception`             | Creates a custom exception class in a module.                                                  | `php artisan make:exception CustomException --module User`                                      |
-| `make:factory`               | Generates a factory class for a module.                                                        | `php artisan make:factory UserFactory --module User`                                            |
-| `make:job`                   | Creates a queued job class within a module.                                                    | `php artisan make:job ProcessUserRegistration --module User`                                    |
-| `make:listener`              | Creates an event listener within a module.                                                     | `php artisan make:listener SendWelcomeEmail --module User`                                      |
-| `make:mail`                  | Generates a mail class for a module.                                                           | `php artisan make:mail WelcomeEmail --module User`                                              |
-| `make:middleware`            | Creates middleware for a module.                                                               | `php artisan make:middleware AdminMiddleware --module User`                                     |
-| `make:model`                 | Scaffolds a model with associated factories, migrations, and policies.                         | `php artisan make:model User --module User`                                                    |
-| `make:notification`          | Generates a notification class scoped to a module.                                             | `php artisan make:notification UserNotification --module User`                                  |
-| `make:observer`              | Creates an observer class for a module.                                                        | `php artisan make:observer UserObserver --module User`                                          |
-| `make:policy`                | Creates a policy class for a model.                                                            | `php artisan make:policy UserPolicy --module User --guard api`                                  |
-| `make:repository`            | Generates a repository class for a module.                                                    | `php artisan make:repository UserRepository --module User`                                      |
-| `make:request`               | Creates a form request class with guard support.                                               | `php artisan make:request UserRequest --module User`                                            |
-| `make:resource`              | Generates an API resource class within a module.                                               | `php artisan make:resource UserResource --module User`                                          |
-| `make:response`              | Creates a custom HTTP response class for a module.                                             | `php artisan make:response CustomResponse --module User`                                        |
-| `make:seeder`                | Scaffolds a seeder class within a module.                                                      | `php artisan make:seeder UserSeeder --module User`                                              |
-| `make:service`               | Generates a service class for business logic encapsulation.                                    | `php artisan make:service UserService --module User`                                            |
-| `make:test`                  | Creates a unit or feature test in a module.                                                    | `php artisan make:test UserTest --module User --unit`                                           |
+| **Command**                 | **Description**                                                                 | **Example**                                                              |
+|-----------------------------|---------------------------------------------------------------------------------|--------------------------------------------------------------------------|
+| `make:story`                | Creates a "story" structure, including controller, routes, and tests.           | `php artisan make:story UserStory --module User --guard api`             |
+| `make:crud`                 | Creates five CRUD stories in a module by calling story:make for each operation. | `php artisan make:crud User --module=Accounts --guard=api`               |
+| `make:migration`            | Generates a migration file in a specific module.                                | `php artisan make:migration create_users_table --module User`            |
+| `db:seed`                   | Runs a module-specific database seeder.                                         | `php artisan db:seed --module User`                                      |
+| `make:cast`                 | Creates a custom cast class for a module.                                       | `php artisan make:cast CustomCast --module User`                         |
+| `make:command`              | Generates a custom Artisan command for a module.                                | `php artisan make:command CustomCommand --module User`                   |
+| `make:controller`           | Scaffolds a controller with associated requests, responses, and services.       | `php artisan make:controller UserController --module User --guard api`   |
+| `make:event`                | Generates an event class within a module.                                       | `php artisan make:event UserRegistered --module User`                    |
+| `make:exception`            | Creates a custom exception class in a module.                                   | `php artisan make:exception CustomException --module User`               |
+| `make:factory`              | Generates a factory class for a module.                                         | `php artisan make:factory UserFactory --module User`                     |
+| `make:job`                  | Creates a queued job class within a module.                                     | `php artisan make:job ProcessUserRegistration --module User`             |
+| `make:listener`             | Creates an event listener within a module.                                      | `php artisan make:listener SendWelcomeEmail --module User`               |
+| `make:mail`                 | Generates a mail class for a module.                                            | `php artisan make:mail WelcomeEmail --module User`                       |
+| `make:middleware`           | Creates middleware for a module.                                                | `php artisan make:middleware AdminMiddleware --module User`              |
+| `make:model`                | Scaffolds a model with associated factories, migrations, and policies.          | `php artisan make:model User --module User`                              |
+| `make:notification`         | Generates a notification class scoped to a module.                              | `php artisan make:notification UserNotification --module User`           |
+| `make:observer`             | Creates an observer class for a module.                                         | `php artisan make:observer UserObserver --module User`                   |
+| `make:policy`               | Creates a policy class for a model.                                             | `php artisan make:policy UserPolicy --module User --guard api`           |
+| `make:repository`           | Generates a repository class for a module.                                      | `php artisan make:repository UserRepository --module User`               |
+| `make:request`              | Creates a form request class with guard support.                                | `php artisan make:request UserRequest --module User`                     |
+| `make:resource`             | Generates an API resource class within a module.                                | `php artisan make:resource UserResource --module User`                   |
+| `make:response`             | Creates a custom HTTP response class for a module.                              | `php artisan make:response CustomResponse --module User`                 |
+| `make:seeder`               | Scaffolds a seeder class within a module.                                       | `php artisan make:seeder UserSeeder --module User`                       |
+| `make:service`              | Generates a service class for business logic encapsulation.                     | `php artisan make:service UserService --module User`                     |
+| `make:test`                 | Creates a unit or feature test in a module.                                     | `php artisan make:test UserTest --module User --unit`                    |
 
 ### Key Notes:
 - **`--module`**: This flag ensures that generated files are scoped to a specific module, keeping the application modular and organized.
 - **`--guard`**: Allows customization of routing and middleware guards for commands where applicable.
+- **`--absolute`**: Specifies the **absolute filesystem path** to the modules root. When provided, paths are resolved using this directory (validated by `AbsolutePathChecker`) instead of the default.
 
 ---
 
